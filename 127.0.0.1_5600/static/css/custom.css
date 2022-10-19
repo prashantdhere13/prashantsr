@@ -1,0 +1,224 @@
+/* ubuntu-300 - latin */
+@font-face {
+  font-family: 'Ubuntu';
+  font-style: normal;
+  font-weight: 300;
+  src: url('../fonts/ubuntu-v15-latin-300.eot'); /* IE9 Compat Modes */
+  src: local('Ubuntu Light'), local('Ubuntu-Light'),
+       url('../fonts/ubuntu-v15-latin-300d41d.eot?#iefix') format('embedded-opentype'), /* IE6-IE8 */
+       url('../fonts/ubuntu-v15-latin-300.woff2') format('woff2'), /* Super Modern Browsers */
+       url('../fonts/ubuntu-v15-latin-300.woff') format('woff'), /* Modern Browsers */
+       url('../fonts/ubuntu-v15-latin-300.ttf') format('truetype'), /* Safari, Android, iOS */
+       url('../fonts/ubuntu-v15-latin-300.svg#Ubuntu') format('svg'); /* Legacy iOS */
+}
+/* ubuntu-regular - latin */
+@font-face {
+  font-family: 'Ubuntu';
+  font-style: normal;
+  font-weight: 400;
+  src: url('../fonts/ubuntu-v15-latin-regular.eot'); /* IE9 Compat Modes */
+  src: local('Ubuntu Regular'), local('Ubuntu-Regular'),
+       url('../fonts/ubuntu-v15-latin-regulard41d.eot?#iefix') format('embedded-opentype'), /* IE6-IE8 */
+       url('../fonts/ubuntu-v15-latin-regular.woff2') format('woff2'), /* Super Modern Browsers */
+       url('../fonts/ubuntu-v15-latin-regular.woff') format('woff'), /* Modern Browsers */
+       url('../fonts/ubuntu-v15-latin-regular.ttf') format('truetype'), /* Safari, Android, iOS */
+       url('../fonts/ubuntu-v15-latin-regular.svg#Ubuntu') format('svg'); /* Legacy iOS */
+}
+/* ubuntu-500 - latin */
+@font-face {
+  font-family: 'Ubuntu';
+  font-style: normal;
+  font-weight: 500;
+  src: url('../fonts/ubuntu-v15-latin-500.eot'); /* IE9 Compat Modes */
+  src: local('Ubuntu Medium'), local('Ubuntu-Medium'),
+       url('../fonts/ubuntu-v15-latin-500d41d.eot?#iefix') format('embedded-opentype'), /* IE6-IE8 */
+       url('../fonts/ubuntu-v15-latin-500.woff2') format('woff2'), /* Super Modern Browsers */
+       url('../fonts/ubuntu-v15-latin-500.woff') format('woff'), /* Modern Browsers */
+       url('../fonts/ubuntu-v15-latin-500.ttf') format('truetype'), /* Safari, Android, iOS */
+       url('../fonts/ubuntu-v15-latin-500.svg#Ubuntu') format('svg'); /* Legacy iOS */
+}
+
+body {
+  font-family: 'Ubuntu', sans-serif !important;
+  padding-top: 10px;
+  width: 99%;
+  margin: auto;
+}
+
+.list-group-item {
+color: #636363;
+}
+
+
+
+/* current colors
+  blue #428bca
+  orange #FC7B3A
+  green #5cb85c
+
+  buz colors
+  orange #ff611c
+  green #cac800
+
+  buz colors 2
+  blue #008bae
+  orange f47c00
+  green  99bd23
+
+  generator + buz2 colors
+  blue #2E86AB
+  orange FE5E41
+  green 85CB33
+*/
+:root {
+  --green: #85CB33;
+  --orange: #FE5E41;
+}
+
+#column_names {
+  font-weight: bold;
+  padding-top: 5px;
+}
+
+#ulist {
+  font-size: 1rem;
+}
+
+#header_column_names {
+  padding-top: 10px;
+}
+
+#addModalLabel, #editModalLabel, #addUserModalLabel,
+ #play_icon, #stop_icon, #restart_icon, #edit_icon, #delete_icon,
+  #signin_h3  {
+  color: #008bae;
+}
+
+::placeholder {
+  font-size: 0.8rem;
+  color: #777;
+}
+
+.header {
+  padding-bottom: 10px;
+  border-bottom: 1px solid #e3e3e3;
+}
+
+.jumbotron {
+  padding-top: 10px;
+  padding-bottom: 30px;
+  padding-left: 10px;
+  padding-right: 10px;
+  height: 98vh;
+  margin-bottom: 0px;
+  background-color: #f5f5f5;
+}
+
+.container-fluid {
+  padding-left: 0px;
+  padding-right: 0px;
+}
+
+#addModal, #editModal  {
+  color: #636363;
+
+}
+
+/* SignIn form start */
+#signin_form {
+  height: auto;
+  max-width: 270px;
+  width: 100%;
+  left: 50%;
+  top: 40%;
+  position: absolute;
+  -webkit-transform: translate3d(-50%, -50%, 0);
+  -moz-transform: translate3d(-50%, -50%, 0);
+  transform: translate3d(-50%, -50%, 0);
+  margin: auto;
+}
+
+#signinLabel {
+color : #636363;
+}
+
+#signin_form:focus {
+
+  z-index: 2;
+}
+
+#signin_form input[type="name"] {
+  margin-bottom: 0px;
+}
+
+#signin_form input[type="password"] {
+  margin-bottom: 10px;
+}
+
+.form-control:focus {
+  border-color: #008bae4A;
+  box-shadow:  0 0 8px #008bae5A;
+}
+/* SignIn form end*/
+
+button.btn.btn-outline-secondary:hover {
+  color: #f9f9f9;
+  background: silver;
+}
+
+button.btn.btn-outline-primary:hover {
+  color: #f9f9f9;
+  border-color: #008bae;
+  background: #008bae;
+}
+
+button.btn.btn-outline-primary {
+  border-color: #008bae;
+  color: #008bae;
+}
+
+#delStreamBtn {
+  border-color: #FE5E41;
+  color: #FE5E41;
+}
+
+#delStreamBtn:hover, #wrongCredentials {
+  color: #f9f9f9;
+  border-color: #FE5E41;
+  background: #FE5E41;
+}
+
+.navbar-light .navbar-brand, .navbar-light .navbar-brand:hover {
+  cursor: default;
+  color :#008bae;
+}
+
+.nav-pills .nav-link:hover {
+  cursor: default;
+  padding: 5px 15px;
+  color: #FE5E41;
+}
+
+.nav-pills .nav-link {
+  padding: 5px 15px;
+  color: #008bae;
+  /*  font-size: 15px; */
+}
+
+#play_icon:hover, #stop_icon:hover, #restart_icon:hover, #edit_icon:hover, #delete_icon:hover, #deleteModalLabel {
+  color: #FE5E41;
+}
+
+#play_icon:active, #stop_icon:active, #restart_icon:active, #edit_icon:active, #delete_icon:active {
+  color: silver;
+}
+
+
+footer {
+  padding-top: 20px;
+  text-align: center;
+  color: #777;
+  border-top: 1px solid #e3e3e3;
+  height: 80px;
+  margin-top: -80px;
+}

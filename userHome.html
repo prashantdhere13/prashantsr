@@ -1,0 +1,580 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <title>Zee RIST and SRT App</title>
+  <link rel="icon"
+    href="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRNN7d4kAyBQtfK-04s8Tm1NvDpQHBgDw7H-4TgY-u-lLttiR2qmRLWlBNv45iRFhFwkyk&usqp=CAU"
+    type="image/x-icon">
+  <!--link rel="shortcut icon" href="/static/favicon.ico"> -->
+  <link href="127.0.0.1_5600/static/css/bootstrap.min.css" rel="stylesheet">
+  <!--  <link href='http://fonts.googleapis.com/css?family=Ubuntu:300,400,500' rel='stylesheet' type='text/css'> -->
+  <link href="127.0.0.1_5600/static/css/custom.css" rel="stylesheet">
+  <script src="127.0.0.1_5600/static/js/jquery-3.5.1.js"></script>
+  <script type="text/javascript" src="http://ajax.aspnetcdn.com/ajax/jquery.templates/beta1/jquery.tmpl.js"></script>
+  <script src="127.0.0.1_5600/static/js/bootstrap.min.js"></script>
+
+  <script>
+    $(function() {
+      GetStreams();
+      $('#btnUpdate').click(function() {
+        if ($('#editStream_Name').val() && $('#editStream_Input_URL').val() && $('#editStream_Output_URL').val()) {
+          $.ajax({
+            url: '/updateStream',
+            data: {
+              stream_name: $('#editStream_Name').val(),
+              stream_input_url: $('#editStream_Input_URL').val(),
+              stream_output_url: $('#editStream_Output_URL').val(),
+              id: localStorage.getItem('editId')
+            },
+            type: 'POST',
+            success: function(res) {
+              $('#editModal').modal('hide');
+
+              // Re populate the grid
+              GetStreams();
+            },
+            error: function(error) {
+              console.log(error);
+            }
+          });
+        }
+      });
+    });
+
+
+    function AddStreams() {
+      $('#btnCreate').click(function() {
+        if ($('#addStream_Name').val() && $('#addStream_Input_URL').val() && $('#addStream_Output_URL').val()) {
+          $.ajax({
+            url: '/addStream',
+            data: {
+              stream_name: $('#addStream_Name').val(),
+              stream_input_url: $('#addStream_Input_URL').val(),
+              stream_output_url: $('#addStream_Output_URL').val(),
+            },
+            type: 'POST',
+            success: function(res) {
+              $('#btnCreate').off('click');
+              $('#addModal').modal('hide');
+
+              // Re populate the grid
+              GetStreams();
+            },
+            error: function(error) {
+              alert(error.responseText);
+              console.log(error.responseText);
+            }
+          });
+        } else alert('Please fill in all fields')
+      });
+    }
+
+
+    function AddUser() {
+      $('#btnAddUser').click(function() {
+        if ($('#inputName').val() && $('#inputEmail').val() && $('#inputPassword').val()) {
+          $.ajax({
+            url: '/addUser',
+            data: {
+              user_name: $('#inputName').val(),
+              user_email: $('#inputEmail').val(),
+              user_password: $('#inputPassword').val(),
+            },
+            type: 'POST',
+            success: function(res) {
+              $('#addUserModal').modal('hide');
+
+              // Re populate the grid
+              GetStreams();
+            },
+            error: function(error) {
+              alert(error.responseText);
+              console.log(error.responseText);
+            }
+          });
+        } else alert('Please fill in all fields')
+      });
+    }
+
+
+    function GetStreams() {
+      $.ajax({
+        url: '/getStream',
+        type: 'GET',
+        success: function(res) {
+          var streamObj = JSON.parse(res);
+          $('#ulist').empty();
+          $('#listTemplate').tmpl(streamObj).appendTo('#ulist');
+          window.updateStreamsTimeout = setTimeout(GetStreams, 3000)
+        },
+        error: function(error) {
+          console.log(error.responseText);
+        }
+      });
+    }
+
+
+    function Edit(elm) {
+      localStorage.setItem('editId', $(elm).attr('data-id'));
+      $.ajax({
+        url: '/getStreamById',
+        data: {
+          id: $(elm).attr('data-id')
+        },
+        type: 'POST',
+        success: function(res) {
+          // Parse the received JSON string
+          var data = JSON.parse(res);
+
+          //Populate the Pop up
+          $('#editStream_Name').val(data[0]['Stream_Name']);
+          $('#editStream_Input_URL').val(data[0]['Stream_Input_URL']);
+          $('#editStream_Output_URL').val(data[0]['Stream_Output_URL']);
+
+          // Trigger the Pop Up
+          $('#editModal').modal();
+        },
+        error: function(error) {
+          alert(error.responseText);
+          console.log(error.responseText);
+        }
+      });
+    }
+
+    function updateStatsModal(data) {
+      $('#statStream td:first').html(data[0]['Stream_Name']);
+      $('#statLink_RTT td:first').html(data[0]['Link_RTT']);
+      $('#statSnd_Stream_Bitrate td:first').html(data[0]['Snd_Stream_Bitrate']);
+      $('#statSnd_Packets td:first').html(data[0]['Snd_Packets']);
+      $('#statSnd_Packets_Lost td:first').html(data[0]['Snd_Packets_Lost']);
+      $('#statSnd_Packets_Dropped td:first').html(data[0]['Snd_Packets_Dropped']);
+      $('#statSnd_Packets_Retransmitted td:first').html(data[0]['Snd_Packets_Retransmitted']);
+      $('#statStream_Bitrate td:first').html(data[0]['Stream_Bitrate']);
+      $('#statRcv_Packets td:first').html(data[0]['Rcv_Packets']);
+      $('#statRcv_Packets_Lost td:first').html(data[0]['Rcv_Packets_Lost']);
+      $('#statRcv_Packets_Dropped td:first').html(data[0]['Rcv_Packets_Dropped']);
+      $('#statRcv_Packets_Retransmitted td:first').html(data[0]['Rcv_Packets_Retransmitted']);
+    }
+
+    function Stats(elm) {
+      var id = $(elm).attr('data-id');
+      $.ajax({
+        url: '/getStreamById',
+        data: {
+          id: id
+        },
+        type: 'POST',
+        success: function(res) {
+          // Parse the received JSON string
+          var data = JSON.parse(res);
+
+          // Trigger the Pop Up
+
+          updateStatsModal(data);
+          window.statsTimer = setTimeout(Stats, 3000, elm);
+        },
+        error: function(error) {
+          alert(error.responseText);
+          console.log(error.responseText);
+        }
+      });
+      return false;
+    }
+
+    function Action(elm) {
+      if ($(elm).attr('data-status') == 'Disabled') {
+        if (($(elm).attr('data-action') == 'stop') || ($(elm).attr('data-action') == 'restart')) {
+          return;
+        }
+      }
+      if (($(elm).attr('data-status') == 'Active') || ($(elm).attr('data-status') == 'Down')) {
+        if ($(elm).attr('data-action') == 'play') {
+          return;
+        }
+      }
+      $.ajax({
+        url: '/actionStream',
+        data: {
+          id: $(elm).attr('data-id'),
+          action: $(elm).attr('data-action'),
+          pid: $(elm).attr('data-pid'),
+          name: $(elm).attr('data-name'),
+        },
+        type: 'POST',
+        error: function(error) {
+          alert(error.responseText);
+          console.log(error.responseText);
+        }
+      });
+    }
+
+
+    function ConfirmDelete(elem) {
+      $('#delStream_Name').text($(elem).attr('data-name'));
+      localStorage.setItem('deleteId', $(elem).attr('data-id'));
+      $('#deleteModal').modal();
+    }
+
+
+    function Delete() {
+
+      $.ajax({
+        url: '/deleteStream',
+        data: {
+          id: localStorage.getItem('deleteId')
+        },
+
+        type: 'POST',
+        success: function(res) {
+          var result = JSON.parse(res);
+          if ((result.status == 'OK') || (result.status == 'Unassigned PID') || (result.status == 'Null PID')) {
+            $('#deleteModal').modal('hide');
+            GetStreams();
+          }
+        },
+        error: function(error) {
+          alert(error.responseText);
+          console.log(error.responseText);
+        }
+      });
+    }
+
+    function refreshData() {
+      getStreams();
+    }
+  </script>
+
+</head>
+
+<body>
+
+  <script id="listTemplate" type="text/x-jQuery-tmpl">
+
+    <li class="list-group-item">
+        <div class="row">
+            <div class="col-md-2">${Stream_Name}</div>
+            <div class="col-md-1" style="${Stream_Status == 'Active' ? 'color : var(--green)' : Stream_Status == 'Down' ? 'color : var(--orange)' : 'color : silver'}; text-align: center;">
+                <span>
+                    <svg class="bi" width="16" height="16">
+                     <use xlink:href="../static/bootstrap-icons.svg#circle-fill"/>
+                    </svg>
+                </span></div>
+            <div class="col-md-1" style="text-align:right">${Stream_Bitrate} Mb/s</div>
+            <div class="col-md-3">${Stream_Input_URL}</div>
+            <div class="col-md-3">${Stream_Output_URL}</div>
+            <div class="col-md-2" style="text-align:center">
+                <div class="button"  >
+                    <a id="play_icon"  data-id=${Id} data-pid=${Stream_PID} data-status=${Stream_Status} data-name=${Stream_Name} data-action='play'  onclick="Action(this)">
+                        <span>
+                            <svg class="bi" width="25" height="25" style="${(Stream_Status == 'Down' || Stream_Status == 'Active') ? 'color : silver' : 'color : inherit'}">
+                             <use xlink:href="../static/bootstrap-icons.svg#play"/>
+                            </svg>
+                        </span>
+                    </a>
+                    <a id="stop_icon" data-id=${Id} data-pid=${Stream_PID} data-status=${Stream_Status} data-name=${Stream_Name} data-action='stop' onclick="Action(this)">
+                        <span>
+                            <svg class="bi" width="25" height="25" style="${(Stream_Status == 'Down' || Stream_Status == 'Active') ? 'color :  inherit' : 'color : silver' }">
+                             <use xlink:href="../static/bootstrap-icons.svg#stop"/>
+                            </svg>
+                        </span>
+                    </a>
+                    <a id="restart_icon" data-id=${Id} data-pid=${Stream_PID} data-status=${Stream_Status} data-name=${Stream_Name} data-action='restart' onclick="Action(this)">
+                        <span>
+                            <svg class="bi" width="25" height="25" style="${(Stream_Status == 'Down' || Stream_Status == 'Active') ? 'color :  inherit' : 'color : silver' }">
+                             <use xlink:href="../static/bootstrap-icons.svg#arrow-repeat"/>
+                            </svg>
+                        </span>
+                    </a>
+                    <a id="edit_icon" data-id=${Id} onclick="Edit(this)">
+                        <span>
+                            <svg class="bi" width="22" height="22">
+                             <use xlink:href="../static/bootstrap-icons.svg#sliders"/>
+                            </svg>
+                        </span>
+                    </a>
+                    <a id="stats_icon" data-id=${Id} data-pid=${Stream_PID} data-status=${Stream_Status} data-name=${Stream_Name} data-toggle="modal" data-target="#statModal">
+                        <span>
+                            <svg class="bi" width="22" height="22" style="${(Stream_Status == 'Down' || Stream_Status == 'Active') ? 'color :  inherit' : 'color : silver' }">
+                             <use xlink:href="../static/bootstrap-icons.svg#info-circle"/>
+                            </svg>
+                        </span>
+                    </a>
+                    <a id="delete_icon" data-id=${Id} data-name=${Stream_Name} onclick="ConfirmDelete(this)">
+                        <span>
+                            <svg class="bi" width="25" height="25">
+                             <use xlink:href="../static/bootstrap-icons.svg#x"/>
+                            </svg>
+                        </span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </li>
+
+
+
+</script>
+
+  <div class="jumbotron">
+    <div class="container-fluid">
+
+      <div class="header">
+        <nav class="navbar navbar-light">
+          <span class="navbar-brand ">Zee BACKUP SRT Unit</span>
+          <ul class="nav nav-pills justify-content-end">
+            <li class="nav-item" role="presentation"><a class="nav-link" data-toggle="modal" data-target="#addModal" onclick="AddStreams();">Add Stream</a></li>
+            <li class="nav-item" role="presentation"><a class="nav-link" data-toggle="modal" data-target="#addUserModal" onclick="AddUser();">Add User</a></li>
+            <li class="nav-item" role="presentation"><a class="nav-link" href="index.html">Logout</a></li>
+          </ul>
+        </nav>
+      </div>
+
+      <div class="container-fluid">
+        <div class="row-cols-8">
+          <div class="col">
+            <ul id="header_column_names" class="list-group">
+              <li id="streams_header_container" class="list-group-item">
+                <div id="column_names" class="row">
+                  <div class="col-md-2">Stream Name</div>
+                  <div class="col-md-1" style="text-align:center">Status</div>
+                  <div class="col-md-1" style="text-align:right">Bitrate</div>
+                  <div class="col-md-3">Input URL</div>
+                  <div class="col-md-3">Output URL</div>
+                  <div class="col-md-2" style="text-align:center">Actions</div>
+                </div>
+              </li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="row-cols-8">
+          <div class="col">
+            <ul id="ulist" class="list-group">
+
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+
+
+    <!-- Add_Stream PopUp -->
+    <div class="modal fade" id="addModal" tabindex="-1" role="dialog" aria-labelledby="addModalLabel" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h4 class="modal-title font-weight-normal" id="addModalLabel">Create Stream</h4>
+            <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+          </div>
+
+          <div class="modal-body">
+            <form role="form" id="addStreamForm">
+              <div class="form-group">
+                <label for="addStream_Name">Stream Name</label>
+                <input class="form-control" type="text" id="addStream_Name" placeholder="..." autocomplete="off">
+              </div>
+              <div class="form-group">
+                <label for="addStream_Input_URL">Input URL</label>
+                <input class="form-control" type="text" id="addStream_Input_URL" placeholder="srt://:33444, srt://123.4.5.6:12345&pkt_size=1316, udp:\\123.4.5.6:1234...">
+              </div>
+              <div class="form-group">
+                <label for="addStream_Output_URL">Output URL</label>
+                <input class="form-control" type="text" id="addStream_Output_URL" placeholder="srt://:33444, srt://123.4.5.6:12345&pkt_size=1316, udp:\\123.4.5.6:1234...">
+              </div>
+            </form>
+          </div>
+
+          <div class="modal-footer">
+            <p>
+              <button type="button" class="btn btn-outline-secondary " data-dismiss="modal">Close</button>
+              <button type="button" id="btnCreate" class="btn btn-outline-primary ">Create</button>
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Edit_Stream PopUp -->
+    <div class="modal fade" id="editModal" tabindex="-1" role="dialog" aria-labelledby="editModalLabel" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h4 class="modal-title font-weight-normal" id="editModalLabel">Update Stream</h4>
+            <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+          </div>
+
+          <div class="modal-body">
+            <form role="form">
+              <div class="form-group">
+                <label for="editStream_Name">Stream Name</label>
+                <input type="text" class="form-control" id="editStream_Name">
+              </div>
+              <div class="form-group">
+                <label for="editStream_Input_URL">Input URL</label>
+                <input type="text" class="form-control" id="editStream_Input_URL">
+              </div>
+              <div class="form-group">
+                <label for="editStream_Output_URL">Output URL</label>
+                <input type="text" class="form-control" id="editStream_Output_URL">
+              </div>
+            </form>
+          </div>
+
+          <div class="modal-footer">
+            <button type="button" class="btn btn-outline-secondary " data-dismiss="modal">Close</button>
+            <button type="button" id="btnUpdate" class="btn btn-outline-primary ">Update</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Show_Stats PopUp -->
+    <div class="modal fade" id="statModal" tabindex="-1" role="dialog" aria-labelledby="statModalLabel" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h4 class="modal-title font-weight-normal" id="statModalLabel">Stream Stats</h4>
+            <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+          </div>
+
+          <div class="modal-body">
+            <table class="table" id="StatTable">
+              <tbody>
+                <tr id="statStream">
+                  <th>Stream</th>
+                  <td></td>
+                </tr>
+                <tr id="statLink_RTT">
+                  <th>Link RTT</th>
+                  <td></td>
+                </tr>
+                <tr id="statSnd_Stream_Bitrate">
+                  <th>Send Stream Bitrate</th>
+                  <td></td>
+                </tr>
+                <tr id="statSnd_Packets">
+                  <th> Sent Packets</th>
+                  <td></td>
+                </tr>
+                <tr id="statSnd_Packets_Lost">
+                  <th>Sent Packets Lost</th>
+                  <td></td>
+                </tr>
+                <tr id="statSnd_Packets_Retransmitted">
+                  <th>Sent Packets Retransmitted</th>
+                  <td></td>
+                </tr>
+                <tr id="statSnd_Packets_Dropped">
+                  <th>Sent Packets Dropped</th>
+                  <td></td>
+                </tr>
+                <tr id="statStream_Bitrate">
+                  <th>Received Stream Bitrate</th>
+                  <td></td>
+                </tr>
+                <tr id="statRcv_Packets">
+                  <th>Received Packets</th>
+                  <td></td>
+                </tr>
+                <tr id="statRcv_Packets_Lost">
+                  <th>Received Packets Lost</th>
+                  <td></td>
+                </tr>
+                <tr id="statRcv_Packets_Retransmitted">
+                  <th>Received Packets Retransmitted</th>
+                  <td></td>
+                </tr>
+                <tr id="statRcv_Packets_Dropped">
+                  <th>Received Packets Dropped</th>
+                  <td></td>
+                </tr>
+              </tbody>
+            </table>
+
+          </div>
+
+          <div class="modal-footer">
+            <button type="button" class="btn btn-outline-secondary " data-dismiss="modal">Close</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Delete_Stream PopUp -->
+    <div class="modal fade" id="deleteModal" tabindex="-1" role="dialog" aria-labelledby="deleteModalLabel" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header ">
+            <h4 class="modal-title w-100 text-center font-weight-normal" id="deleteModalLabel">Delete the stream "<span id="delStream_Name"></span>" ?</h4>
+          </div>
+
+          <div class="modal-footer">
+            <button type="button" class="btn btn-outline-secondary" data-dismiss="modal">Cancel</button>
+            <button type="button" class="btn btn-outline-primary" id="delStreamBtn" onclick="Delete()">Delete </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Add_User PopUp -->
+    <div class="modal fade" id="addUserModal" tabindex="-1" role="dialog" aria-labelledby="addUserModalLabel" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h4 class="modal-title font-weight-normal" id="addUserModalLabel">Add New User</h4>
+            <button type="button" class="close" data-dismiss="modal">
+              <span aria-hidden="true">&times;</span><span class="sr-only">Close</span>
+            </button>
+          </div>
+
+          <div class="modal-body">
+            <form role="form">
+              <div class="form-group">
+                <form class="form-signin">
+                  <label for="inputName" class="sr-only">Name</label>
+                  <input type="text" name="inputName" id="inputName" class="form-control" placeholder="Name" required autofocus>
+                  <label for="inputEmail" class="sr-only">Email address</label>
+                  <input type="email" name="inputEmail" id="inputEmail" class="form-control" placeholder="Email address" required autofocus>
+                  <label for="inputPassword" class="sr-only">Password</label>
+                  <input type="password" name="inputPassword" id="inputPassword" class="form-control" placeholder="Password" required>
+                </form>
+              </div>
+            </form>
+          </div>
+
+          <div class="modal-footer">
+            <p>
+              <button type="button" class="btn btn-outline-secondary" data-dismiss="modal">Close</button>
+              <button type="button" id="btnAddUser" class="btn btn-outline-primary">Add User</button>
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+
+
+  <footer class="footer">
+    <p>&copy; Zee Enterainment Enterprize Limited</p>
+  </footer>
+  <script type="text/javascript">
+    $("#statModal").on('show.bs.modal', function(event) {
+      var element = event.relatedTarget;
+      if (window.updateStreamsTimeout !== undefined) {
+        clearTimeout(window.updateStreamsTimeout);
+      }
+      Stats(element);
+    });
+
+    $("#statModal").on('hide.bs.modal', function() {
+      if (window.statsTimer !== undefined) {
+        clearTimeout(window.statsTimer);
+        window.updateStreamsTimeout = setTimeout(GetStreams, 3000);
+      }
+    })
+  </script>
+ </div>
+</body>
+
+</html>
